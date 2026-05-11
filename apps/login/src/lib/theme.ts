@@ -4,6 +4,7 @@ export type ThemeRoundness = "edgy" | "mid" | "full";
 export type ThemeLayout = "side-by-side" | "top-to-bottom";
 export type ThemeAppearance = "flat" | "material" | "glass";
 export type ThemeSpacing = "regular" | "compact";
+export type ThemeBrand = "default" | "semsites";
 
 export interface ComponentRoundnessConfig {
   card: ThemeRoundness;
@@ -22,6 +23,12 @@ export interface ThemeConfig {
   backgroundImage?: string;
   appearance: ThemeAppearance;
   spacing: ThemeSpacing;
+  brand: ThemeBrand;
+  brandName: string;
+  brandEyebrow: string;
+  brandHeadline: string;
+  brandDescription: string;
+  brandFootnote: string;
 }
 
 // Default component-specific roundness configuration
@@ -42,6 +49,12 @@ export const DEFAULT_THEME: ThemeConfig = {
   layout: "top-to-bottom",
   appearance: "flat",
   spacing: "regular",
+  brand: "default",
+  brandName: "SEMSITES",
+  brandEyebrow: "geschützter Zugang",
+  brandHeadline: "Sicher anmelden. Klar steuern.",
+  brandDescription: "CMS, App Store und Domain-Steuerung laufen über eine geschützte Identität.",
+  brandFootnote: "Self-hosted IAM für autorisierte SEMSITES Arbeitsbereiche.",
 };
 
 // Get theme configuration from environment variables
@@ -69,6 +82,12 @@ export function getThemeConfig(): ThemeConfig {
     backgroundImage: process.env.NEXT_PUBLIC_THEME_BACKGROUND_IMAGE || undefined,
     appearance: (process.env.NEXT_PUBLIC_THEME_APPEARANCE as ThemeAppearance) || DEFAULT_THEME.appearance,
     spacing: (process.env.NEXT_PUBLIC_THEME_SPACING as ThemeSpacing) || DEFAULT_THEME.spacing,
+    brand: (process.env.NEXT_PUBLIC_THEME_BRAND as ThemeBrand) || DEFAULT_THEME.brand,
+    brandName: process.env.NEXT_PUBLIC_THEME_BRAND_NAME || DEFAULT_THEME.brandName,
+    brandEyebrow: process.env.NEXT_PUBLIC_THEME_BRAND_EYEBROW || DEFAULT_THEME.brandEyebrow,
+    brandHeadline: process.env.NEXT_PUBLIC_THEME_BRAND_HEADLINE || DEFAULT_THEME.brandHeadline,
+    brandDescription: process.env.NEXT_PUBLIC_THEME_BRAND_DESCRIPTION || DEFAULT_THEME.brandDescription,
+    brandFootnote: process.env.NEXT_PUBLIC_THEME_BRAND_FOOTNOTE || DEFAULT_THEME.brandFootnote,
   };
 }
 
