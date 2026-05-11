@@ -10,6 +10,7 @@ import {
   SPACING_STYLES,
   ThemeAppearance,
   ThemeBrand,
+  ThemeBrandLayout,
   ThemeLayout,
   ThemeRoundness,
   ThemeSpacing,
@@ -72,6 +73,7 @@ describe("Theme Configuration", () => {
         brandHeadline: "",
         brandDescription: "",
         brandFootnote: "",
+        brandLayout: "aligned-card",
       });
     });
 
@@ -97,6 +99,7 @@ describe("Theme Configuration", () => {
       delete process.env.NEXT_PUBLIC_THEME_BRAND_HEADLINE;
       delete process.env.NEXT_PUBLIC_THEME_BRAND_DESCRIPTION;
       delete process.env.NEXT_PUBLIC_THEME_BRAND_FOOTNOTE;
+      delete process.env.NEXT_PUBLIC_THEME_BRAND_LAYOUT;
 
       const config = getThemeConfig();
 
@@ -107,6 +110,7 @@ describe("Theme Configuration", () => {
       expect(config.componentRoundness).toEqual(DEFAULT_COMPONENT_ROUNDNESS);
       expect(config.brand).toBe(DEFAULT_THEME.brand);
       expect(config.brandName).toBe(DEFAULT_THEME.brandName);
+      expect(config.brandLayout).toBe(DEFAULT_THEME.brandLayout);
     });
 
     it("should use global roundness from environment variable", () => {
@@ -180,6 +184,7 @@ describe("Theme Configuration", () => {
       process.env.NEXT_PUBLIC_THEME_BRAND_HEADLINE = "Custom headline";
       process.env.NEXT_PUBLIC_THEME_BRAND_DESCRIPTION = "Custom description";
       process.env.NEXT_PUBLIC_THEME_BRAND_FOOTNOTE = "Custom footnote";
+      process.env.NEXT_PUBLIC_THEME_BRAND_LAYOUT = "full-split";
 
       const config = getThemeConfig();
 
@@ -189,6 +194,7 @@ describe("Theme Configuration", () => {
       expect(config.brandHeadline).toBe("Custom headline");
       expect(config.brandDescription).toBe("Custom description");
       expect(config.brandFootnote).toBe("Custom footnote");
+      expect(config.brandLayout).toBe("full-split");
     });
 
     it("should have undefined background image when not set", () => {
@@ -204,6 +210,7 @@ describe("Theme Configuration", () => {
       process.env.NEXT_PUBLIC_THEME_SPACING = "compact";
       process.env.NEXT_PUBLIC_THEME_BACKGROUND_IMAGE = "https://example.com/bg.png";
       process.env.NEXT_PUBLIC_THEME_BRAND = "semsites";
+      process.env.NEXT_PUBLIC_THEME_BRAND_LAYOUT = "aligned-card";
 
       const config = getThemeConfig();
 
@@ -213,6 +220,7 @@ describe("Theme Configuration", () => {
       expect(config.spacing).toBe("compact");
       expect(config.backgroundImage).toBe("https://example.com/bg.png");
       expect(config.brand).toBe("semsites");
+      expect(config.brandLayout).toBe("aligned-card");
     });
   });
 
@@ -443,6 +451,13 @@ describe("Theme Configuration", () => {
       const validValues: ThemeBrand[] = ["default", "semsites"];
       validValues.forEach((value) => {
         expect(["default", "semsites"]).toContain(value);
+      });
+    });
+
+    it("should accept valid ThemeBrandLayout values", () => {
+      const validValues: ThemeBrandLayout[] = ["aligned-card", "full-split"];
+      validValues.forEach((value) => {
+        expect(["aligned-card", "full-split"]).toContain(value);
       });
     });
   });

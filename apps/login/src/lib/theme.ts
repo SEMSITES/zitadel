@@ -5,6 +5,7 @@ export type ThemeLayout = "side-by-side" | "top-to-bottom";
 export type ThemeAppearance = "flat" | "material" | "glass";
 export type ThemeSpacing = "regular" | "compact";
 export type ThemeBrand = "default" | "semsites";
+export type ThemeBrandLayout = "aligned-card" | "full-split";
 
 export interface ComponentRoundnessConfig {
   card: ThemeRoundness;
@@ -29,6 +30,7 @@ export interface ThemeConfig {
   brandHeadline: string;
   brandDescription: string;
   brandFootnote: string;
+  brandLayout: ThemeBrandLayout;
 }
 
 // Default component-specific roundness configuration
@@ -55,6 +57,7 @@ export const DEFAULT_THEME: ThemeConfig = {
   brandHeadline: "",
   brandDescription: "",
   brandFootnote: "",
+  brandLayout: "aligned-card",
 };
 
 // Get theme configuration from environment variables
@@ -88,6 +91,7 @@ export function getThemeConfig(): ThemeConfig {
     brandHeadline: process.env.NEXT_PUBLIC_THEME_BRAND_HEADLINE || DEFAULT_THEME.brandHeadline,
     brandDescription: process.env.NEXT_PUBLIC_THEME_BRAND_DESCRIPTION || DEFAULT_THEME.brandDescription,
     brandFootnote: process.env.NEXT_PUBLIC_THEME_BRAND_FOOTNOTE || DEFAULT_THEME.brandFootnote,
+    brandLayout: (process.env.NEXT_PUBLIC_THEME_BRAND_LAYOUT as ThemeBrandLayout) || DEFAULT_THEME.brandLayout,
   };
 }
 

@@ -52,17 +52,23 @@ Add a custom background image:
 Adds an optional branded presentation layer without changing the login flow, session handling, MFA, or OIDC behavior:
 
 - **`default`** - ZITADEL login layout
-- **`semsites`** - SEMSITES split-screen layout with configurable left-panel copy
+- **`semsites`** - SEMSITES split-screen layout with a neutral brand panel
 
-Optional copy variables:
+Optional layout variables:
 
 ```env
 NEXT_PUBLIC_THEME_BRAND_NAME=SEMSITES
+NEXT_PUBLIC_THEME_BRAND_LAYOUT=aligned-card
 NEXT_PUBLIC_THEME_BRAND_EYEBROW=
 NEXT_PUBLIC_THEME_BRAND_HEADLINE=
 NEXT_PUBLIC_THEME_BRAND_DESCRIPTION=
 NEXT_PUBLIC_THEME_BRAND_FOOTNOTE=
 ```
+
+`NEXT_PUBLIC_THEME_BRAND_LAYOUT` supports:
+
+- `aligned-card`: rounded card shell; brand and form are aligned on one horizontal band.
+- `full-split`: full-page split shell; same alignment without the rounded outer card.
 
 ## Example Settings
 
