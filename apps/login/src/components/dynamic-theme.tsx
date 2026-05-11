@@ -1,10 +1,12 @@
 "use client";
 
 import { Logo } from "@/components/logo";
+import { getThemeConfig } from "@/lib/theme";
 import { useResponsiveLayout } from "@/lib/theme-hooks";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import React, { Children, ReactNode } from "react";
 import { Card } from "./card";
+import { SemsitesLoginLayout } from "./semsites-login-layout";
 import { ThemeWrapper } from "./theme-wrapper";
 
 /**
@@ -27,6 +29,7 @@ export function DynamicTheme({
   branding?: BrandingSettings;
 }) {
   const { isSideBySide } = useResponsiveLayout();
+  const themeConfig = getThemeConfig();
 
   // Resolve children immediately to avoid passing functions through React
   const actualChildren: ReactNode = React.useMemo(() => {
@@ -47,6 +50,17 @@ export function DynamicTheme({
 
             // If there's only one child, it's likely the old format - keep it on the right side
             const hasLeftRightStructure = childArray.length === 2;
+
+            if (themeConfig.brand === "semsites") {
+              return (
+                <SemsitesLoginLayout
+                  branding={branding}
+                  hasLeftRightStructure={hasLeftRightStructure}
+                  leftContent={leftContent}
+                  rightContent={rightContent}
+                />
+              );
+            }
 
             return (
               <div className="relative mx-auto w-full max-w-[1100px] px-8 py-4">

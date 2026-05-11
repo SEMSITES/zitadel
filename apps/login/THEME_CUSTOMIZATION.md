@@ -47,6 +47,23 @@ Add a custom background image:
 - Use external URLs: `https://example.com/background.jpg`
 - Leave empty for solid color backgrounds
 
+### 🏷️ Brand Variant (`NEXT_PUBLIC_THEME_BRAND`)
+
+Adds an optional branded presentation layer without changing the login flow, session handling, MFA, or OIDC behavior:
+
+- **`default`** - ZITADEL login layout
+- **`semsites`** - SEMSITES split-screen layout with configurable left-panel copy
+
+Optional copy variables:
+
+```env
+NEXT_PUBLIC_THEME_BRAND_NAME=SEMSITES
+NEXT_PUBLIC_THEME_BRAND_EYEBROW=geschützter Zugang
+NEXT_PUBLIC_THEME_BRAND_HEADLINE=Sicher anmelden. Klar steuern.
+NEXT_PUBLIC_THEME_BRAND_DESCRIPTION=CMS, App Store und Domain-Steuerung laufen über eine geschützte Identität.
+NEXT_PUBLIC_THEME_BRAND_FOOTNOTE=Self-hosted IAM für autorisierte SEMSITES Arbeitsbereiche.
+```
+
 ## Example Settings
 
 ### Tech Startup
@@ -57,6 +74,16 @@ NEXT_PUBLIC_THEME_LAYOUT=side-by-side
 NEXT_PUBLIC_THEME_SPACING=regular
 NEXT_PUBLIC_THEME_APPEARANCE=material
 NEXT_PUBLIC_THEME_BACKGROUND_IMAGE=/images/tech-gradient.jpg
+```
+
+### SEMSITES Gateway
+
+```env
+NEXT_PUBLIC_THEME_ROUNDNESS=mid
+NEXT_PUBLIC_THEME_LAYOUT=side-by-side
+NEXT_PUBLIC_THEME_SPACING=regular
+NEXT_PUBLIC_THEME_APPEARANCE=material
+NEXT_PUBLIC_THEME_BRAND=semsites
 ```
 
 ### Corporate Bank

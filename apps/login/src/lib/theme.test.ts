@@ -9,6 +9,7 @@ import {
   ROUNDNESS_CLASSES,
   SPACING_STYLES,
   ThemeAppearance,
+  ThemeBrand,
   ThemeLayout,
   ThemeRoundness,
   ThemeSpacing,
@@ -65,6 +66,12 @@ describe("Theme Configuration", () => {
         layout: "top-to-bottom",
         appearance: "flat",
         spacing: "regular",
+        brand: "default",
+        brandName: "SEMSITES",
+        brandEyebrow: "geschützter Zugang",
+        brandHeadline: "Sicher anmelden. Klar steuern.",
+        brandDescription: "CMS, App Store und Domain-Steuerung laufen über eine geschützte Identität.",
+        brandFootnote: "Self-hosted IAM für autorisierte SEMSITES Arbeitsbereiche.",
       });
     });
 
@@ -73,6 +80,7 @@ describe("Theme Configuration", () => {
       expect(DEFAULT_THEME.layout).toBe("top-to-bottom");
       expect(DEFAULT_THEME.appearance).toBe("flat");
       expect(DEFAULT_THEME.spacing).toBe("regular");
+      expect(DEFAULT_THEME.brand).toBe("default");
     });
   });
 
@@ -83,6 +91,12 @@ describe("Theme Configuration", () => {
       delete process.env.NEXT_PUBLIC_THEME_APPEARANCE;
       delete process.env.NEXT_PUBLIC_THEME_SPACING;
       delete process.env.NEXT_PUBLIC_THEME_BACKGROUND_IMAGE;
+      delete process.env.NEXT_PUBLIC_THEME_BRAND;
+      delete process.env.NEXT_PUBLIC_THEME_BRAND_NAME;
+      delete process.env.NEXT_PUBLIC_THEME_BRAND_EYEBROW;
+      delete process.env.NEXT_PUBLIC_THEME_BRAND_HEADLINE;
+      delete process.env.NEXT_PUBLIC_THEME_BRAND_DESCRIPTION;
+      delete process.env.NEXT_PUBLIC_THEME_BRAND_FOOTNOTE;
 
       const config = getThemeConfig();
 
@@ -91,6 +105,8 @@ describe("Theme Configuration", () => {
       expect(config.appearance).toBe(DEFAULT_THEME.appearance);
       expect(config.spacing).toBe(DEFAULT_THEME.spacing);
       expect(config.componentRoundness).toEqual(DEFAULT_COMPONENT_ROUNDNESS);
+      expect(config.brand).toBe(DEFAULT_THEME.brand);
+      expect(config.brandName).toBe(DEFAULT_THEME.brandName);
     });
 
     it("should use global roundness from environment variable", () => {
@@ -157,6 +173,24 @@ describe("Theme Configuration", () => {
       expect(config.backgroundImage).toBe(backgroundUrl);
     });
 
+    it("should use brand settings from environment variables", () => {
+      process.env.NEXT_PUBLIC_THEME_BRAND = "semsites";
+      process.env.NEXT_PUBLIC_THEME_BRAND_NAME = "SEMSITES IAM";
+      process.env.NEXT_PUBLIC_THEME_BRAND_EYEBROW = "Custom eyebrow";
+      process.env.NEXT_PUBLIC_THEME_BRAND_HEADLINE = "Custom headline";
+      process.env.NEXT_PUBLIC_THEME_BRAND_DESCRIPTION = "Custom description";
+      process.env.NEXT_PUBLIC_THEME_BRAND_FOOTNOTE = "Custom footnote";
+
+      const config = getThemeConfig();
+
+      expect(config.brand).toBe("semsites");
+      expect(config.brandName).toBe("SEMSITES IAM");
+      expect(config.brandEyebrow).toBe("Custom eyebrow");
+      expect(config.brandHeadline).toBe("Custom headline");
+      expect(config.brandDescription).toBe("Custom description");
+      expect(config.brandFootnote).toBe("Custom footnote");
+    });
+
     it("should have undefined background image when not set", () => {
       const config = getThemeConfig();
 
@@ -169,6 +203,7 @@ describe("Theme Configuration", () => {
       process.env.NEXT_PUBLIC_THEME_APPEARANCE = "glass";
       process.env.NEXT_PUBLIC_THEME_SPACING = "compact";
       process.env.NEXT_PUBLIC_THEME_BACKGROUND_IMAGE = "https://example.com/bg.png";
+      process.env.NEXT_PUBLIC_THEME_BRAND = "semsites";
 
       const config = getThemeConfig();
 
@@ -177,6 +212,7 @@ describe("Theme Configuration", () => {
       expect(config.appearance).toBe("glass");
       expect(config.spacing).toBe("compact");
       expect(config.backgroundImage).toBe("https://example.com/bg.png");
+      expect(config.brand).toBe("semsites");
     });
   });
 
@@ -400,6 +436,13 @@ describe("Theme Configuration", () => {
       const validValues: ThemeSpacing[] = ["regular", "compact"];
       validValues.forEach((value) => {
         expect(["regular", "compact"]).toContain(value);
+      });
+    });
+
+    it("should accept valid ThemeBrand values", () => {
+      const validValues: ThemeBrand[] = ["default", "semsites"];
+      validValues.forEach((value) => {
+        expect(["default", "semsites"]).toContain(value);
       });
     });
   });
