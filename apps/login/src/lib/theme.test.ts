@@ -68,10 +68,10 @@ describe("Theme Configuration", () => {
         spacing: "regular",
         brand: "default",
         brandName: "SEMSITES",
-        brandEyebrow: "geschützter Zugang",
-        brandHeadline: "Sicher anmelden. Klar steuern.",
-        brandDescription: "CMS, App Store und Domain-Steuerung laufen über eine geschützte Identität.",
-        brandFootnote: "Self-hosted IAM für autorisierte SEMSITES Arbeitsbereiche.",
+        brandEyebrow: "",
+        brandHeadline: "",
+        brandDescription: "",
+        brandFootnote: "",
       });
     });
 

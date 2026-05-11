@@ -51,10 +51,10 @@ export const DEFAULT_THEME: ThemeConfig = {
   spacing: "regular",
   brand: "default",
   brandName: "SEMSITES",
-  brandEyebrow: "geschützter Zugang",
-  brandHeadline: "Sicher anmelden. Klar steuern.",
-  brandDescription: "CMS, App Store und Domain-Steuerung laufen über eine geschützte Identität.",
-  brandFootnote: "Self-hosted IAM für autorisierte SEMSITES Arbeitsbereiche.",
+  brandEyebrow: "",
+  brandHeadline: "",
+  brandDescription: "",
+  brandFootnote: "",
 };
 
 // Get theme configuration from environment variables
