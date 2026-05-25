@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import ThemeSwitch from "@/components/theme-switch";
 import { LANGS, getLanguage } from "@/lib/i18n";
 import { getServiceConfig } from "@/lib/service-url";
+import { getThemeConfig } from "@/lib/theme";
 import { getAllowedLanguages } from "@/lib/zitadel";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import type { Metadata } from "next";
@@ -29,6 +30,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
+  const themeConfig = getThemeConfig();
+  const isSemsitesFullSplit =
+    themeConfig.brand === "semsites" && themeConfig.layout === "side-by-side" && themeConfig.brandLayout === "full-split";
 
   let languages = LANGS;
   try {
@@ -51,9 +55,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <Suspense
               fallback={
                 <BackgroundWrapper
-                  className={`relative flex min-h-screen flex-col justify-center bg-background-light-600 dark:bg-background-dark-600`}
+                  className={
+                    isSemsitesFullSplit
+                      ? "relative min-h-screen bg-white dark:bg-white"
+                      : "relative flex min-h-screen flex-col justify-center bg-background-light-600 dark:bg-background-dark-600"
+                  }
                 >
-                  <div className="relative mx-auto w-full max-w-[440px] py-8">
+                  <div
+                    className={
+                      isSemsitesFullSplit ? "relative min-h-screen w-full" : "relative mx-auto w-full max-w-[440px] py-8"
+                    }
+                  >
                     <Skeleton>
                       <div className="h-40"></div>
                     </Skeleton>
@@ -66,11 +78,25 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             >
               <LanguageProvider>
                 <BackgroundWrapper
-                  className={`relative flex min-h-screen flex-col justify-center bg-background-light-600 dark:bg-background-dark-600`}
+                  className={
+                    isSemsitesFullSplit
+                      ? "relative min-h-screen bg-white dark:bg-white"
+                      : "relative flex min-h-screen flex-col justify-center bg-background-light-600 dark:bg-background-dark-600"
+                  }
                 >
-                  <div className="relative mx-auto w-full max-w-[1100px] py-8">
+                  <div
+                    className={
+                      isSemsitesFullSplit ? "relative min-h-screen w-full" : "relative mx-auto w-full max-w-[1100px] py-8"
+                    }
+                  >
                     <div>{children}</div>
-                    <div className="mx-auto flex max-w-[440px] flex-row items-center justify-end space-x-4 px-4 py-4 md:max-w-full md:px-8">
+                    <div
+                      className={
+                        isSemsitesFullSplit
+                          ? "absolute right-6 top-6 z-20 flex flex-row items-center justify-end space-x-4"
+                          : "mx-auto flex max-w-[440px] flex-row items-center justify-end space-x-4 px-4 py-4 md:max-w-full md:px-8"
+                      }
+                    >
                       <LanguageSwitcher languages={languages} />
                       <ThemeSwitch />
                     </div>

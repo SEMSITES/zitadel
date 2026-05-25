@@ -1,6 +1,5 @@
 "use client";
 
-import { Logo } from "@/components/logo";
 import { useThemeConfig } from "@/lib/theme-hooks";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import { ReactNode } from "react";
@@ -12,7 +11,7 @@ type Props = {
   rightContent: ReactNode;
 };
 
-export function SemsitesLoginLayout({ branding, hasLeftRightStructure, leftContent, rightContent }: Props) {
+export function SemsitesLoginLayout({ hasLeftRightStructure, leftContent, rightContent }: Props) {
   const themeConfig = useThemeConfig();
   const formContent = hasLeftRightStructure ? rightContent : leftContent;
   const isFullSplit = themeConfig.brandLayout === "full-split";
@@ -39,19 +38,10 @@ export function SemsitesLoginLayout({ branding, hasLeftRightStructure, leftConte
     <div className={outerClass}>
       <div className={shellClass}>
         <section className={brandSectionClass}>
-          <div className="relative z-10 flex items-center gap-6">
-            {branding?.lightTheme?.logoUrl || branding?.darkTheme?.logoUrl ? (
-              <Logo
-                lightSrc={branding.lightTheme?.logoUrl ?? branding.darkTheme?.logoUrl}
-                darkSrc={branding.darkTheme?.logoUrl ?? branding.lightTheme?.logoUrl}
-                height={72}
-                width={240}
-              />
-            ) : (
-              <img src={logoSrc} alt="SEMSITES" className="h-36 w-36 rounded-[32px] object-contain" />
-            )}
+          <div className="relative z-10 flex items-center gap-5">
+            <img src={logoSrc} alt="" className="h-20 w-20 rounded-[20px] object-contain" />
             <div>
-              <p className="text-lg font-bold uppercase tracking-[0.34em] text-[#9cf6d0]">{themeConfig.brandName}</p>
+              <p className="text-2xl font-bold uppercase tracking-[0.28em] text-[#9cf6d0]">{themeConfig.brandName}</p>
             </div>
           </div>
         </section>
