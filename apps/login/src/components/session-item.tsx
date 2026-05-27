@@ -92,9 +92,9 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
               }
             }
           }}
-          className="group flex flex-row items-center rounded-md border border-divider-light bg-background-light-400 px-4 py-2 transition-all hover:shadow-lg dark:bg-background-dark-400 dark:hover:bg-white/10"
+          className="group flex w-full min-w-0 flex-row items-center rounded-md border border-divider-light bg-background-light-400 px-4 py-2 transition-all hover:shadow-lg dark:bg-background-dark-400 dark:hover:bg-white/10"
         >
-          <div className="pr-4">
+          <div className="shrink-0 pr-4">
             <Avatar
               size="small"
               loginName={session.factors?.user?.loginName as string}
@@ -102,17 +102,17 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
             />
           </div>
 
-          <div className="flex flex-col items-start overflow-hidden">
-            <span className="">{session.factors?.user?.displayName}</span>
-            <span className="text-ellipsis text-xs opacity-80">{session.factors?.user?.loginName}</span>
+          <div className="flex min-w-0 flex-1 flex-col items-start overflow-hidden">
+            <span className="block max-w-full truncate">{session.factors?.user?.displayName}</span>
+            <span className="block max-w-full truncate text-xs opacity-80">{session.factors?.user?.loginName}</span>
             {valid ? (
-              <span className="text-ellipsis text-xs opacity-80">
+              <span className="block max-w-full truncate text-xs opacity-80">
                 <Translated i18nKey="verified" namespace="accounts" />{" "}
                 {verifiedAt && moment(timestampDate(verifiedAt)).fromNow()}
               </span>
             ) : (
               verifiedAt && (
-                <span className="text-ellipsis text-xs opacity-80">
+                <span className="block max-w-full truncate text-xs opacity-80">
                   <Translated i18nKey="expired" namespace="accounts" />{" "}
                   {session.expirationDate && moment(timestampDate(session.expirationDate)).fromNow()}
                 </span>
@@ -120,8 +120,7 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
             )}
           </div>
 
-          <span className="flex-grow"></span>
-          <div className="relative flex flex-row items-center">
+          <div className="relative ml-3 flex shrink-0 flex-row items-center">
             {valid ? (
               <div className="absolute right-6 mx-2 h-2 w-2 transform rounded-full bg-green-500 transition-all group-hover:right-6 sm:right-0"></div>
             ) : (
