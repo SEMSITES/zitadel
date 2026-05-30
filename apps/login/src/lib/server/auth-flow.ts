@@ -8,6 +8,7 @@ import { getServiceConfig } from "@/lib/service-url";
 import { listSessions, ServiceConfig } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { headers } from "next/headers";
+import { reportIamEvent } from "./iam-events";
 
 const logger = createLogger("auth-flow");
 
@@ -58,7 +59,29 @@ export async function completeAuthFlow(
     // Safety net - ensure we always return a valid object
     if (!result || typeof result !== "object" || (!("redirect" in result) && !("error" in result))) {
       logger.error("Auth flow: Invalid result from loginWithOIDCAndSession:", { result });
+      reportIamEvent({
+        event: "auth_flow_invalid_result",
+        level: "error",
+        status: "invalid_result",
+        method: "oidc",
+        requestId,
+        sessionId,
+        organization: command.organization,
+      });
       return { error: "Authentication completed but navigation failed" };
+    }
+
+    if ("error" in result) {
+      reportIamEvent({
+        event: "auth_flow_failed",
+        level: "error",
+        status: "flow_error",
+        method: "oidc",
+        requestId,
+        sessionId,
+        organization: command.organization,
+        message: result.error,
+      });
     }
 
     return result;
@@ -79,11 +102,41 @@ export async function completeAuthFlow(
       (!("redirect" in result) && !("error" in result) && !("samlData" in result))
     ) {
       logger.error("Auth flow: Invalid result from loginWithSAMLAndSession:", { result });
+      reportIamEvent({
+        event: "auth_flow_invalid_result",
+        level: "error",
+        status: "invalid_result",
+        method: "saml",
+        requestId,
+        sessionId,
+        organization: command.organization,
+      });
       return { error: "Authentication completed but navigation failed" };
+    }
+
+    if ("error" in result) {
+      reportIamEvent({
+        event: "auth_flow_failed",
+        level: "error",
+        status: "flow_error",
+        method: "saml",
+        requestId,
+        sessionId,
+        organization: command.organization,
+        message: result.error,
+      });
     }
 
     return result;
   }
 
+  reportIamEvent({
+    event: "auth_flow_failed",
+    level: "warn",
+    status: "invalid_request_id",
+    requestId,
+    sessionId,
+    organization: command.organization,
+  });
   return { error: "Invalid request ID format" };
 }

@@ -1,5 +1,6 @@
 import { metrics } from "@opentelemetry/api";
 import "server-only";
+import { reportIamEvent } from "./server/iam-events";
 
 const serviceName = process.env.OTEL_SERVICE_NAME || "zitadel-login";
 const meter = metrics.getMeter(serviceName);
@@ -76,6 +77,14 @@ export function recordAuthFailure(method: string, reason: string, organization?:
     method,
     reason,
     organization: organization || "unknown",
+  });
+  reportIamEvent({
+    event: "auth_failure",
+    level: "warn",
+    status: reason,
+    method,
+    organization,
+    message: "Authentication failure",
   });
 }
 

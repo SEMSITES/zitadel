@@ -4,6 +4,7 @@ import { createCallback, getLoginSettings, ServiceConfig } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
 import { CreateCallbackRequestSchema, SessionSchema } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { reportIamEvent, summarizeError } from "./server/iam-events";
 import { isSessionValid } from "./session";
 
 type LoginWithOIDCAndSession = {
@@ -66,8 +67,20 @@ export async function loginWithOIDCAndSession({
           return { error: "An error occurred!" };
         }
       } catch (error: unknown) {
+        const handled = error && typeof error === "object" && "code" in error && error?.code === 9;
+        reportIamEvent({
+          event: "oidc_callback_failed",
+          level: handled ? "warn" : "error",
+          status: handled ? "handled_precondition" : "callback_error",
+          method: "oidc",
+          requestId: `oidc_${authRequest}`,
+          sessionId: cookie.id,
+          organization: selectedSession.factors?.user?.organizationId,
+          errorClass: summarizeError(error).name,
+          message: summarizeError(error).message,
+        });
         // handle already handled gracefully as these could come up if old emails with requestId are used (reset password, register emails etc.)
-        if (error && typeof error === "object" && "code" in error && error?.code === 9) {
+        if (handled) {
           const loginSettings = await getLoginSettings({
             serviceConfig,
             organization: selectedSession.factors?.user?.organizationId,
@@ -95,5 +108,13 @@ export async function loginWithOIDCAndSession({
   }
 
   // If no session found or no valid cookie, return error
+  reportIamEvent({
+    event: "oidc_session_missing",
+    level: "warn",
+    status: "session_missing",
+    method: "oidc",
+    requestId: `oidc_${authRequest}`,
+    sessionId,
+  });
   return { error: "Session not found or invalid" };
 }

@@ -27,6 +27,7 @@ import { SecuritySettings } from "@zitadel/proto/zitadel/settings/v2/security_se
 import escapeHtml from "escape-html";
 import { NextRequest, NextResponse } from "next/server";
 import { buildCSP } from "../csp";
+import { reportIamEvent, summarizeError } from "./iam-events";
 
 const logger = createLogger("flow-initiation");
 
@@ -249,6 +250,16 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           }
         } catch (error) {
           logger.error("Failed to execute sendLoginname:", { error });
+          reportIamEvent({
+            event: "flow_loginname_failed",
+            level: "warn",
+            status: "loginname_error",
+            method: "oidc",
+            requestId,
+            organization,
+            errorClass: summarizeError(error).name,
+            message: summarizeError(error).message,
+          });
         }
       }
 
@@ -352,6 +363,17 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         }
       } catch (error) {
         logger.error("Error creating callback:", { error });
+        reportIamEvent({
+          event: "oidc_callback_failed",
+          level: "error",
+          status: "callback_error",
+          method: "oidc",
+          requestId,
+          sessionId: cookie.id,
+          organization,
+          errorClass: summarizeError(error).name,
+          message: summarizeError(error).message,
+        });
         return gotoAccounts({
           request,
           requestId,
@@ -462,6 +484,16 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
     }
   } catch (error) {
     logger.error("SAML createResponse failed:", { error });
+    reportIamEvent({
+      event: "saml_response_failed",
+      level: "error",
+      status: "response_error",
+      method: "saml",
+      requestId,
+      sessionId: cookie.id,
+      errorClass: summarizeError(error).name,
+      message: summarizeError(error).message,
+    });
   }
 
   // Final fallback: SAML response creation failed - show account selection

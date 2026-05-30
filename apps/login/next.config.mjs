@@ -1,7 +1,11 @@
 import createNextIntlPlugin from "next-intl/plugin";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { DEFAULT_CSP } from "./constants/csp.js";
 
 const withNextIntl = createNextIntlPlugin();
+const loginConfigDir = path.dirname(fileURLToPath(import.meta.url));
+const monorepoRoot = path.resolve(loginConfigDir, "../..");
 
 const secureHeaders = [
   {
@@ -32,6 +36,9 @@ const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   output: process.env.NEXT_OUTPUT_MODE || undefined,
   reactStrictMode: true,
+  turbopack: {
+    root: monorepoRoot,
+  },
   experimental: {
     // Add React 19 compatibility optimizations
     optimizePackageImports: ["@radix-ui/react-tooltip", "@heroicons/react"],
