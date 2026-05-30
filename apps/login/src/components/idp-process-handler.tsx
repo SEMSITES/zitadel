@@ -50,8 +50,6 @@ export function IdpProcessHandler({
 
     executedRef.current = true;
 
-    console.log("[IDP Process Handler] Starting IDP callback processing from client");
-
     processIDPCallback({
       provider,
       id,
@@ -64,20 +62,17 @@ export function IdpProcessHandler({
     })
       .then((result) => {
         if (result.error) {
-          console.error("[IDP Process Handler] Error:", result.error);
           setError(result.error);
           setLoading(false);
           return;
         }
 
         if (result.redirect) {
-          console.log("[IDP Process Handler] Redirecting to:", result.redirect);
           router.push(result.redirect);
           return;
         }
 
         if (result.samlData) {
-          console.log("[IDP Process Handler] Received samlData, rendering AutoSubmitForm");
           setSamlData(result.samlData);
           setLoading(false);
           return;
@@ -86,9 +81,8 @@ export function IdpProcessHandler({
         setError(t("processing.noRedirect"));
         setLoading(false);
       })
-      .catch((err) => {
-        console.error("[IDP Process Handler] Unexpected error:", err);
-        setError(err instanceof Error ? err.message : t("processing.unexpectedError"));
+      .catch(() => {
+        setError(t("processing.unexpectedError"));
         setLoading(false);
       });
   }, [provider, id, token, requestId, organization, link, sessionId, linkFingerprint, postErrorRedirectUrl, router, t]);

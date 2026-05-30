@@ -21,7 +21,6 @@ export function SessionsClearList({ sessions, logoutHint, postLogoutRedirectUri,
   const router = useRouter();
 
   const clearHintedSession = useCallback(async () => {
-    console.log("Clearing session for login hint:", logoutHint);
     // If a login hint is provided, we logout that specific session
     const sessionIdToBeCleared = sessions.find((session) => {
       return session.factors?.user?.loginName === logoutHint;
@@ -30,13 +29,12 @@ export function SessionsClearList({ sessions, logoutHint, postLogoutRedirectUri,
     if (sessionIdToBeCleared) {
       const clearSessionResponse = await clearSession({
         sessionId: sessionIdToBeCleared,
-      }).catch((error) => {
-        console.error("Error clearing session:", error);
+      }).catch(() => {
         return;
       });
 
       if (!clearSessionResponse) {
-        console.error("Failed to clear session for login hint:", logoutHint);
+        return;
       }
 
       if (postLogoutRedirectUri) {
@@ -50,8 +48,6 @@ export function SessionsClearList({ sessions, logoutHint, postLogoutRedirectUri,
       }
 
       return router.push("/logout/done?" + params);
-    } else {
-      console.warn(`No session found for login hint: ${logoutHint}`);
     }
   }, [logoutHint, sessions, postLogoutRedirectUri, organization, router]);
 

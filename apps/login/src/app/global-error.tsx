@@ -5,7 +5,7 @@ import { Button } from "@/components/button";
 import { ThemeWrapper } from "@/components/theme-wrapper";
 import { Translated } from "@/components/translated";
 
-export default function GlobalError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+export default function GlobalError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
     // global-error must include html and body tags
     <html>
@@ -14,7 +14,7 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
           <Boundary labels={["Login Error"]} color="red">
             <div className="space-y-4">
               <div className="text-sm text-red-500 dark:text-red-500">
-                <span className="font-bold">Error:</span> {error?.message}
+                <Translated i18nKey="failedLoading" namespace="error" />
               </div>
               <div>
                 <Button data-i18n-key="error.tryagain" onClick={() => reset()}>

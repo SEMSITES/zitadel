@@ -90,8 +90,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
       }),
       requestId,
     })
-      .catch((error) => {
-        console.error(error);
+      .catch(() => {
         setError(t("verify.errors.couldNotRequestChallenge"));
         return;
       })
@@ -178,7 +177,6 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
         } else {
           setError(t("verify.errors.verificationFailed"));
         }
-        console.error("Passkey verification error:", error);
       })
       .finally(() => {
         setLoading(false);

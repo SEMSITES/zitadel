@@ -47,7 +47,6 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           publicHost: serviceConfig.publicHost,
         },
       );
-      console.log("logout token payload", payload);
 
       if (payload.post_logout_redirect_uri && typeof payload.post_logout_redirect_uri === "string") {
         postLogoutRedirectUri = payload.post_logout_redirect_uri;

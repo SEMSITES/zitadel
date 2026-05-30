@@ -49,31 +49,22 @@ export async function completeFlowOrGetUrl(
   command: FinishFlowCommand & { organization?: string },
   defaultRedirectUri?: string,
 ): Promise<{ redirect: string } | { error: string } | { samlData: { url: string; fields: Record<string, string> } }> {
-  console.log("completeFlowOrGetUrl called with:", command, "defaultRedirectUri:", defaultRedirectUri);
-
   // Complete OIDC/SAML flows directly with server action
   if (
     "sessionId" in command &&
     "requestId" in command &&
     (command.requestId.startsWith("saml_") || command.requestId.startsWith("oidc_"))
   ) {
-    console.log("completeFlowOrGetUrl: OIDC/SAML flow detected");
     // This completes the flow and returns a redirect URL or error
-    const result = await completeAuthFlow({
+    return completeAuthFlow({
       sessionId: command.sessionId,
       requestId: command.requestId,
     });
-    console.log("completeFlowOrGetUrl: got OIDC/SAML flow result");
-    return result;
   }
 
-  console.log("completeFlowOrGetUrl: Regular flow, getting next URL");
   // For all other cases, return URL for navigation
   const url = await getNextUrl(command, defaultRedirectUri);
-  console.log("completeFlowOrGetUrl: got Next URL:", url);
-  const result = { redirect: url };
-  console.log("completeFlowOrGetUrl: got final result");
-  return result;
+  return { redirect: url };
 }
 
 /**
@@ -86,8 +77,6 @@ export async function getNextUrl(
   command: FinishFlowCommand & { organization?: string },
   defaultRedirectUri?: string,
 ): Promise<string> {
-  console.log("getNextUrl called with:", command, "defaultRedirectUri:", defaultRedirectUri);
-
   // finish Device Authorization Flow
   if (
     "requestId" in command &&
@@ -98,16 +87,13 @@ export async function getNextUrl(
       ...command,
       organization: command.organization,
     });
-    console.log("getNextUrl: Got Device flow result");
     return result;
   }
 
   // OIDC/SAML flows are now handled by completeAuthFlowAction() server action
   // This function only handles device flows and fallback navigation
 
-  const result = await resolveRedirectUri(command, defaultRedirectUri);
-  console.log("getNextUrl: Resolved redirect URI:", result);
-  return result;
+  return resolveRedirectUri(command, defaultRedirectUri);
 }
 
 /**
@@ -127,13 +113,11 @@ export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedi
         const _headers = await headers();
         const host = getPublicHostWithProtocol(_headers);
         const result = `${host}${envOverride}`;
-        console.log("resolveRedirectUri: Using host-based redirect from override:", result);
         return result;
-      } catch (error) {
-        console.warn("resolveRedirectUri: Could not determine host for override, falling back", error);
+      } catch {
+        // Fall back to the relative signed-in page if the public host cannot be resolved.
       }
     } else {
-      console.log("resolveRedirectUri: Using DEFAULT_REDIRECT_URI override:", envOverride);
       return envOverride;
     }
   }
@@ -141,15 +125,10 @@ export async function resolveRedirectUri(command: FinishFlowCommand, defaultRedi
   // 2. Default redirect URI from settings
   if (defaultRedirectUri) {
     if (isSafeRedirectUri(defaultRedirectUri)) {
-      console.log("resolveRedirectUri: Using defaultRedirectUri from settings:", defaultRedirectUri);
       return defaultRedirectUri;
-    } else {
-      console.warn("resolveRedirectUri: Unsafe defaultRedirectUri prevented:", defaultRedirectUri);
     }
   }
 
   // 3. Default signed-in page (relative)
-  const result = goToSignedInPage(command);
-  console.log("resolveRedirectUri: Using relative goToSignedInPage result:", result);
-  return result;
+  return goToSignedInPage(command);
 }

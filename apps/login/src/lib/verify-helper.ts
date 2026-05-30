@@ -279,12 +279,10 @@ export async function checkUserVerification(userId: string): Promise<boolean> {
   const cookieValue = await cookiesList.get("verificationCheck")?.value;
 
   if (!cookieValue) {
-    console.warn("User verification check cookie not found. User verification check failed.");
     return false;
   }
 
   if (cookieValue !== verificationCheck) {
-    console.warn(`User verification check failed. Expected ${verificationCheck} but got ${cookieValue}`);
     return false;
   }
 

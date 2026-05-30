@@ -23,8 +23,6 @@ export async function loginWithSAMLAndSession({
 }: LoginWithSAMLAndSession): Promise<
   { error: string } | { redirect: string } | { samlData: { url: string; fields: Record<string, string> } }
 > {
-  console.log(`Login with session: ${sessionId} and samlRequest: ${samlRequest}`);
-
   const selectedSession = sessions.find((s) => s.id === sessionId);
 
   if (selectedSession && selectedSession.id) {
@@ -87,8 +85,6 @@ export async function loginWithSAMLAndSession({
         }
       } catch (error: unknown) {
         // handle already handled gracefully as these could come up if old emails with requestId are used (reset password, register emails etc.)
-        console.error(error);
-
         if (error && typeof error === "object" && "code" in error && error?.code === 9) {
           const loginSettings = await getLoginSettings({
             serviceConfig,

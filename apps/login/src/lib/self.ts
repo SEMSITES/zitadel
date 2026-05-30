@@ -42,7 +42,6 @@ export async function setMyPassword({ sessionId, password }: { sessionId: string
       {},
     )
     .catch((error) => {
-      console.log(error);
       if (error.code === 7) {
         return { error: "Session is not valid." };
       }

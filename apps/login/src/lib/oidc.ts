@@ -25,8 +25,6 @@ export async function loginWithOIDCAndSession({
   if (selectedSession && selectedSession.id) {
     const isValid = await isSessionValid({ serviceConfig, session: selectedSession });
 
-    console.log("Session is valid:", isValid);
-
     if (!isValid && selectedSession.factors?.user) {
       // if the session is not valid anymore, we need to redirect the user to re-authenticate /
       // TODO: handle IDP intent direcly if available
@@ -69,7 +67,6 @@ export async function loginWithOIDCAndSession({
         }
       } catch (error: unknown) {
         // handle already handled gracefully as these could come up if old emails with requestId are used (reset password, register emails etc.)
-        console.error(error);
         if (error && typeof error === "object" && "code" in error && error?.code === 9) {
           const loginSettings = await getLoginSettings({
             serviceConfig,
