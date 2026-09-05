@@ -3,6 +3,7 @@
 import { useThemeConfig } from "@/lib/theme-hooks";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import { ReactNode } from "react";
+import { SurfaceThemeProvider } from "./surface-theme";
 
 type Props = {
   branding?: BrandingSettings;
@@ -41,14 +42,16 @@ export function SemsitesLoginLayout({ hasLeftRightStructure, leftContent, rightC
           <div className="relative z-10 flex items-center gap-5">
             <img src={logoSrc} alt="" className="h-20 w-20 rounded-[20px] object-contain" />
             <div>
-              <p className="text-2xl font-bold uppercase tracking-[0.28em] text-[#9cf6d0]">{themeConfig.brandName}</p>
+              <p className="text-2xl font-bold uppercase tracking-[0.28em] text-white">{themeConfig.brandName}</p>
             </div>
           </div>
         </section>
 
         <section className={formSectionClass}>
           <div className="w-full min-w-0 max-w-[440px]">
-            <div className="space-y-6">{formContent}</div>
+            <SurfaceThemeProvider theme={isFullSplit ? "light" : "inherit"}>
+              <div className={`space-y-6 ${isFullSplit ? "text-gray-950" : ""}`}>{formContent}</div>
+            </SurfaceThemeProvider>
           </div>
         </section>
       </div>
