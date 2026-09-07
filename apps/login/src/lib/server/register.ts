@@ -13,6 +13,7 @@ import { getOrSetFingerprintId } from "../fingerprint";
 import { createLogger } from "../logger";
 import { getServiceConfig } from "../service-url";
 import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
+import { sendLoginname } from "./loginname";
 
 const logger = createLogger("register");
 
@@ -80,14 +81,29 @@ export async function registerUser(
     return { error: t("errors.localAuthenticationNotAllowed") };
   }
 
-  const addResponse = await addHumanUser({
-    serviceConfig,
-    email: command.email,
-    firstName: command.firstName,
-    lastName: command.lastName,
-    password: command.password ? command.password : undefined,
-    organization: command.organization,
-  });
+  let addResponse;
+  try {
+    addResponse = await addHumanUser({
+      serviceConfig,
+      email: command.email,
+      firstName: command.firstName,
+      lastName: command.lastName,
+      password: command.password ? command.password : undefined,
+      organization: command.organization,
+    });
+  } catch (error) {
+    if (error instanceof ConnectError && error.code === Code.AlreadyExists) {
+      logger.info("Registration found an existing account, continuing with login");
+      const loginResponse = await sendLoginname({
+        loginName: command.email,
+        organization: command.organization,
+        requestId: command.requestId,
+        ignoreUnknownUsernames: loginSettings.ignoreUnknownUsernames,
+      });
+      return loginResponse ?? { error: t("errors.couldNotCreateSession") };
+    }
+    throw error;
+  }
 
   if (!addResponse) {
     return { error: t("errors.couldNotCreateUser") };

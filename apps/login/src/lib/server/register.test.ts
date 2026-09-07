@@ -9,6 +9,7 @@ vi.mock("next/headers", () => ({
 
 vi.mock("@zitadel/client", () => ({
   Code: {
+    AlreadyExists: 6,
     NotFound: 5,
     PermissionDenied: 7,
   },
@@ -26,6 +27,10 @@ vi.mock("@zitadel/client", () => ({
 vi.mock("@/lib/server/cookie", () => ({
   createSessionAndUpdateCookie: vi.fn(),
   createSessionForIdpAndUpdateCookie: vi.fn(),
+}));
+
+vi.mock("./loginname", () => ({
+  sendLoginname: vi.fn(),
 }));
 
 vi.mock("../zitadel", () => ({
@@ -53,7 +58,7 @@ vi.mock("../fingerprint", () => ({
 }));
 
 vi.mock("../logger", () => ({
-  createLogger: vi.fn(() => ({ warn: vi.fn() })),
+  createLogger: vi.fn(() => ({ info: vi.fn(), warn: vi.fn() })),
 }));
 
 vi.mock("../verify-helper", () => ({
@@ -73,6 +78,7 @@ describe("registerUser", () => {
     const { addHumanUser, getLoginSettings, getUserByID } = await import("../zitadel");
     const { getServiceConfig } = await import("../service-url");
     const { checkEmailVerification } = await import("../verify-helper");
+    const { sendLoginname } = await import("./loginname");
 
     vi.mocked(headers).mockResolvedValue(new Headers());
     vi.mocked(getServiceConfig).mockReturnValue({ serviceConfig: { baseUrl: "https://api.example.com" } });
@@ -91,6 +97,9 @@ describe("registerUser", () => {
       },
     });
     vi.mocked(checkEmailVerification).mockReturnValue({ redirect: "/verify" });
+    vi.mocked(sendLoginname).mockResolvedValue({
+      redirect: "/password?loginName=existing-invitee%40example.test&organization=org-1&requestId=request-1",
+    });
 
     mockCreateSessionAndUpdateCookie = vi.mocked(createSessionAndUpdateCookie);
   });
@@ -168,5 +177,73 @@ describe("registerUser", () => {
 
     await rejection;
     expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalledTimes(3);
+  });
+
+  test("continues an already existing invited account through the normal login flow", async () => {
+    const { addHumanUser } = await import("../zitadel");
+    const { sendLoginname } = await import("./loginname");
+    vi.mocked(addHumanUser).mockRejectedValue(new ConnectError("user already exists", Code.AlreadyExists));
+
+    await expect(
+      registerUser({
+        email: "existing-invitee@example.test",
+        firstName: "Design",
+        lastName: "Blumenhof Barkmeyer",
+        organization: "org-1",
+        password: "test-password",
+        requestId: "request-1",
+      }),
+    ).resolves.toEqual({
+      redirect: "/password?loginName=existing-invitee%40example.test&organization=org-1&requestId=request-1",
+    });
+
+    expect(sendLoginname).toHaveBeenCalledWith({
+      loginName: "existing-invitee@example.test",
+      organization: "org-1",
+      requestId: "request-1",
+      ignoreUnknownUsernames: undefined,
+    });
+    expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+  });
+
+  test("does not mask a non-AlreadyExists user creation failure", async () => {
+    const { addHumanUser } = await import("../zitadel");
+    const { sendLoginname } = await import("./loginname");
+    const denied = new ConnectError("permission denied", Code.PermissionDenied);
+    vi.mocked(addHumanUser).mockRejectedValue(denied);
+
+    await expect(
+      registerUser({
+        email: "new-invitee@example.test",
+        firstName: "Design",
+        lastName: "Blumenhof Barkmeyer",
+        organization: "org-1",
+        password: "test-password",
+        requestId: "request-1",
+      }),
+    ).rejects.toBe(denied);
+
+    expect(sendLoginname).not.toHaveBeenCalled();
+    expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+  });
+
+  test("returns a generic session error when existing-account login cannot continue", async () => {
+    const { addHumanUser } = await import("../zitadel");
+    const { sendLoginname } = await import("./loginname");
+    vi.mocked(addHumanUser).mockRejectedValue(new ConnectError("user already exists", Code.AlreadyExists));
+    vi.mocked(sendLoginname).mockResolvedValue(undefined);
+
+    await expect(
+      registerUser({
+        email: "existing-invitee@example.test",
+        firstName: "Design",
+        lastName: "Blumenhof Barkmeyer",
+        organization: "org-1",
+        password: "test-password",
+        requestId: "request-1",
+      }),
+    ).resolves.toEqual({ error: "errors.couldNotCreateSession" });
+
+    expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
   });
 });
